@@ -1,0 +1,9 @@
+{
+  "sites": [
+    {
+      "siteName": "무신사",
+      "url": "https://www.musinsacareers.com/",
+      "jobListSelector": "//*[@id='0d34fec3-9738-4eb7-9fe7-f720bb99ec73']/div/div/div[2]/div[2]/ul"
+    }
+  ]
+}
