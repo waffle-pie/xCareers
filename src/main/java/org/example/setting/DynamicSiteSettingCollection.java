@@ -1,4 +1,4 @@
-package org.example.site.dynamic;
+package org.example.setting;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,16 +9,19 @@ import org.example.scraper.StaticJobScraper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class DynamicSiteSettingCollection {
+import lombok.Getter;
+
+@Getter
+public class DynamicSiteSettingCollection implements SettingCollection<DynamicSiteSettingCollection> {
 	private List<DynamicSiteSetting> sites;
 
-	public static DynamicSiteSettingCollection init(ObjectMapper objectMapper) throws IOException {
+	@Override
+	public DynamicSiteSettingCollection init(ObjectMapper objectMapper) throws IOException {
 		ClassLoader classLoader = StaticJobScraper.class.getClassLoader();
 		File file = new File(Objects.requireNonNull(classLoader.getResource("dynamic_site_config.json")).getFile());
-		return (DynamicSiteSettingCollection) objectMapper.readValue(file, DynamicSiteSettingCollection.class);
-	}
-
-	public List<DynamicSiteSetting> getSites() {
-		return sites;
+		DynamicSiteSettingCollection loaded = objectMapper.readValue(file,
+			DynamicSiteSettingCollection.class);
+		this.sites = loaded.sites;
+		return this;
 	}
 }

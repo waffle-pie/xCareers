@@ -1,9 +1,10 @@
-package org.example.site.dynamic;
+package org.example.setting;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
 
+@Getter
 public class DynamicSiteSetting {
 	@JsonProperty
 	private String siteName;
@@ -12,15 +13,4 @@ public class DynamicSiteSetting {
 	@JsonProperty
 	private String jobListSelector;
 
-	public String getSiteName() {
-		return siteName;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public String getJobListSelector() {
-		return jobListSelector;
-	}
 }

@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.example.recruitment.RecruitmentNotice;
-import org.example.site.SiteSetting;
+import org.example.setting.StaticSiteSetting;
+import org.example.setting.StaticSiteSettingCollection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,24 +15,20 @@ import org.jsoup.select.Elements;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class StaticJobScraper implements JobScraper {
+public class StaticJobScraper extends JobScraper<StaticSiteSettingCollection> {
 
-	private List<SiteSetting> settings;
-	private ObjectMapper objectMapper;
-
-	public StaticJobScraper(List<SiteSetting> settings, ObjectMapper objectMapper) {
-		this.settings = settings;
-		this.objectMapper = objectMapper;
+	public StaticJobScraper(StaticSiteSettingCollection setting) {
+		super(setting);
 	}
 
 	@Override
-	public void run() {
+	public void setUp(StaticSiteSettingCollection setting, ObjectMapper objectMapper) throws IOException {
 		try {
 			// 1️⃣ JSON 설정 파일 읽기
 			List<RecruitmentNotice> allJobs = new ArrayList<>();
 
 			// 2️⃣ 각 사이트 크롤링 실행
-			for (SiteSetting site : settings) {
+			for (StaticSiteSetting site : setting.getSites()) {
 				allJobs.addAll(scrapeSite(site));
 			}
 
@@ -44,7 +41,7 @@ public class StaticJobScraper implements JobScraper {
 		}
 	}
 
-	private List<RecruitmentNotice> scrapeSite(SiteSetting setting) {
+	private List<RecruitmentNotice> scrapeSite(StaticSiteSetting setting) {
 		List<RecruitmentNotice> jobs = new ArrayList<>();
 		try {
 			// 4️⃣ 해당 사이트에서 HTML 가져오기
@@ -78,4 +75,6 @@ public class StaticJobScraper implements JobScraper {
 		Element element = parent.selectFirst(selector);
 		return element != null ? element.text().trim() : "정보 없음";
 	}
+
+
 }
