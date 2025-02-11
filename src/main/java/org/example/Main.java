@@ -17,6 +17,6 @@ public class Main {
 		StaticJobScraper scraper2 = new StaticJobScraper(staticSetting);
 
 		scraper.run();
-		scraper2.run();
+		// scraper2.run();
 	}
 }

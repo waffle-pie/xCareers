@@ -24,13 +24,14 @@ public class RecruitmentNotice {
 	private String regular;
 	@JsonProperty
 	private String location;
-
 	@JsonProperty
 	private String deadline;
+	@JsonProperty
+	private String href;
 
 	@Builder
 	private RecruitmentNotice(String site, String title, String company, String job, String career, String regular,
-		String location, String deadline) {
+		String location, String deadline, String href) {
 		this.site = site;
 		this.title = title;
 		this.company = company;
@@ -39,6 +40,7 @@ public class RecruitmentNotice {
 		this.regular = regular;
 		this.location = location;
 		this.deadline = deadline;
+		this.href = href;
 	}
 
 	@Builder
@@ -64,6 +66,14 @@ public class RecruitmentNotice {
 			.regular(regular)
 			.location(location)
 			.deadline(deadline)
+			.build();
+	}
+
+	public static RecruitmentNotice create(String site, String title,String href) {
+		return RecruitmentNotice.builder()
+			.site(site)
+			.title(title)
+			.href(href)
 			.build();
 	}
 
