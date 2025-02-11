@@ -1,11 +1,11 @@
-package org.example.site;
+package org.example.setting;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
 
 @Getter
-public class SiteSetting {
+public class StaticSiteSetting {
 	@JsonProperty
 	private String siteName;
 	@JsonProperty

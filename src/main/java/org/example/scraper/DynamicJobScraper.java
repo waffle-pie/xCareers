@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.example.recruitment.RecruitmentNotice;
-import org.example.site.dynamic.DynamicSiteSetting;
+import org.example.setting.DynamicSiteSetting;
+import org.example.setting.DynamicSiteSettingCollection;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -13,19 +14,15 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class DynamicJobScraper implements JobScraper {
+public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> {
 	private final String PROJECT_PATH = System.getProperty("user.dir");
 
-	List<DynamicSiteSetting> settings;
-	private ObjectMapper objectMapper;
-
-	public DynamicJobScraper(List<DynamicSiteSetting> settings, ObjectMapper objectMapper) {
-		this.settings = settings;
-		this.objectMapper = objectMapper;
+	public DynamicJobScraper(DynamicSiteSettingCollection setting) {
+		super(setting);
 	}
 
 	@Override
-	public void run() {
+	public void setUp(DynamicSiteSettingCollection setting, ObjectMapper objectMapper) {
 		try {
 			List<RecruitmentNotice> allJobs = new ArrayList<>();
 
@@ -33,7 +30,7 @@ public class DynamicJobScraper implements JobScraper {
 			System.setProperty("webdriver.chrome.driver",
 				PROJECT_PATH + "\\src\\main\\resources\\driver\\chromedriver.exe");
 
-			for (DynamicSiteSetting site : settings) {
+			for (DynamicSiteSetting site : setting.getSites()) {
 				WebDriver driver = new ChromeDriver();
 				allJobs.addAll(scrapeSite(driver, site));
 			}

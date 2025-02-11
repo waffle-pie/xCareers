@@ -1,4 +1,4 @@
-package org.example.site.dynamic;
+package org.example.setting;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

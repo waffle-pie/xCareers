@@ -4,22 +4,19 @@ import java.io.IOException;
 
 import org.example.scraper.DynamicJobScraper;
 import org.example.scraper.StaticJobScraper;
-import org.example.site.dynamic.DynamicSiteSettingCollection;
-import org.example.site.SiteSettingCollection;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.setting.StaticSiteSettingCollection;
+import org.example.setting.DynamicSiteSettingCollection;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		SiteSettingCollection setting = SiteSettingCollection.init(objectMapper);
-		DynamicSiteSettingCollection dynamicSetting = DynamicSiteSettingCollection.init(objectMapper);
+		DynamicSiteSettingCollection setting = new DynamicSiteSettingCollection();
+		DynamicJobScraper scraper = new DynamicJobScraper(setting);
 
-		StaticJobScraper scraper1 = new StaticJobScraper(setting.getSites(),objectMapper);
+		StaticSiteSettingCollection staticSetting = new StaticSiteSettingCollection();
+		StaticJobScraper scraper2 = new StaticJobScraper(staticSetting);
 
-		DynamicJobScraper scraper2 = new DynamicJobScraper(dynamicSetting.getSites(),objectMapper);
-
+		scraper.run();
 		scraper2.run();
 	}
 }
