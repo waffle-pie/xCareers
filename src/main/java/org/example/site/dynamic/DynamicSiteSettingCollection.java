@@ -9,6 +9,9 @@ import org.example.scraper.StaticJobScraper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.Getter;
+
+@Getter
 public class DynamicSiteSettingCollection {
 	private List<DynamicSiteSetting> sites;
 
@@ -18,7 +21,4 @@ public class DynamicSiteSettingCollection {
 		return (DynamicSiteSettingCollection) objectMapper.readValue(file, DynamicSiteSettingCollection.class);
 	}
 
-	public List<DynamicSiteSetting> getSites() {
-		return sites;
-	}
 }

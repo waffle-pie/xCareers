@@ -9,6 +9,9 @@ import org.example.scraper.StaticJobScraper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.Getter;
+
+@Getter
 public class SiteSettingCollection {
 	private List<SiteSetting> sites;
 
@@ -18,7 +21,4 @@ public class SiteSettingCollection {
 		return (SiteSettingCollection) objectMapper.readValue(file, SiteSettingCollection.class);
 	}
 
-	public List<SiteSetting> getSites() {
-		return sites;
-	}
 }
