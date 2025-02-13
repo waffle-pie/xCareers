@@ -1,7 +1,5 @@
 package org.example.scraper;
 
-import java.io.File;
-import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,60 +11,37 @@ import org.example.setting.DynamicSiteSettingCollection;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> {
-	private final String GRID_URL = "http://localhost:4444/wd/hub";
+	private final WebDriver webDriver;
 
-	public DynamicJobScraper(DynamicSiteSettingCollection setting) {
+	public DynamicJobScraper(DynamicSiteSettingCollection setting, WebDriver webDriver) {
 		super(setting);
+		this.webDriver = webDriver;
 	}
 
 	@Override
-	public void setUp(DynamicSiteSettingCollection setting, ObjectMapper objectMapper) {
-		try {
-			List<RecruitmentNotice> allJobs = new ArrayList<>();
+	public List<RecruitmentNotice> scrapingBy(DynamicSiteSettingCollection setting) {
 
-			ChromeOptions options = new ChromeOptions();
-			options.setCapability("browserName", "chrome");
+		List<RecruitmentNotice> allJobs = new ArrayList<>();
 
-			WebDriver driver = null;
-			try {
-				driver = new RemoteWebDriver(new URL(GRID_URL), options);
-				for (DynamicSiteSetting site : setting.getSites()) {
-					allJobs.addAll(scrapeSite(driver, site));
-				}
-
-				objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("jobs.json"), allJobs);
-			} catch (NoSuchElementException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				if (driver != null) {
-					driver.quit();
-				}
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		for (DynamicSiteSetting site : setting.getSites()) {
+			allJobs.addAll(scraping(site));
 		}
+		return allJobs;
 	}
 
-	private List<RecruitmentNotice> scrapeSite(WebDriver driver, DynamicSiteSetting setting) {
+	private List<RecruitmentNotice> scraping(DynamicSiteSetting setting) {
 		List<RecruitmentNotice> jobs = new ArrayList<>();
 		try {
-			driver.get(setting.getUrl());
+			webDriver.get(setting.getUrl());
 
-			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+			WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
 			WebElement jobList = wait.until(
 				ExpectedConditions.presenceOfElementLocated(By.xpath(setting.getJobListSelector())));
 
-			// ✅ 공고 리스트 확인
 			List<WebElement> jobElements = jobList.findElements(By.xpath(setting.getJobDetailSelector()));
 
 			if (jobElements.isEmpty()) {
@@ -91,10 +66,7 @@ public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> 
 						System.out.println("⚠️ a 태그 없음");
 					}
 
-
-					// title = jobElement.findElement(By.tagName("h3")).getAttribute("innerText");
 					title = jobElement.getAttribute("innerText");
-					// ✅ 결과 저장
 					if (title != null && link != null) {
 						jobs.add(RecruitmentNotice.create(setting.getSiteName(), title, link));
 					}
