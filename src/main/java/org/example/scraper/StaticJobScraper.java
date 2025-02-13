@@ -1,6 +1,5 @@
 package org.example.scraper;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +11,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.openqa.selenium.WebDriver;
 
 public class StaticJobScraper extends JobScraper<StaticSiteSettingCollection> {
 
@@ -22,23 +20,13 @@ public class StaticJobScraper extends JobScraper<StaticSiteSettingCollection> {
 	}
 
 	@Override
-	public void setUp(StaticSiteSettingCollection setting, ObjectMapper objectMapper) throws IOException {
-		try {
-			// 1️⃣ JSON 설정 파일 읽기
-			List<RecruitmentNotice> allJobs = new ArrayList<>();
+	public List<RecruitmentNotice> scrapingBy(StaticSiteSettingCollection setting) {
+		List<RecruitmentNotice> allJobs = new ArrayList<>();
 
-			// 2️⃣ 각 사이트 크롤링 실행
-			for (StaticSiteSetting site : setting.getSites()) {
-				allJobs.addAll(scrapeSite(site));
-			}
-
-			// 3️⃣ 결과 JSON 저장
-			objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("jobs.json"), allJobs);
-			System.out.println("📁 크롤링 완료: jobs.json 파일 저장됨");
-
-		} catch (IOException e) {
-			e.printStackTrace();
+		for (StaticSiteSetting site : setting.getSites()) {
+			allJobs.addAll(scrapeSite(site));
 		}
+		return allJobs;
 	}
 
 	private List<RecruitmentNotice> scrapeSite(StaticSiteSetting setting) {
@@ -75,6 +63,5 @@ public class StaticJobScraper extends JobScraper<StaticSiteSettingCollection> {
 		Element element = parent.selectFirst(selector);
 		return element != null ? element.text().trim() : "정보 없음";
 	}
-
 
 }

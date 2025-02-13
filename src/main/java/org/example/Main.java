@@ -2,21 +2,25 @@ package org.example;
 
 import java.io.IOException;
 
+import org.example.driver.WebDriverFactory;
 import org.example.scraper.DynamicJobScraper;
-import org.example.scraper.StaticJobScraper;
-import org.example.setting.StaticSiteSettingCollection;
 import org.example.setting.DynamicSiteSettingCollection;
+import org.openqa.selenium.WebDriver;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
 
 		DynamicSiteSettingCollection setting = new DynamicSiteSettingCollection();
-		DynamicJobScraper scraper = new DynamicJobScraper(setting);
+		WebDriver webDriver = WebDriverFactory.createChromeDriver();
 
-		StaticSiteSettingCollection staticSetting = new StaticSiteSettingCollection();
-		StaticJobScraper scraper2 = new StaticJobScraper(staticSetting);
+		DynamicJobScraper scraper = new DynamicJobScraper(setting, webDriver);
 
-		scraper.run();
-		// scraper2.run();
+		try {
+			scraper.run();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			webDriver.quit();
+		}
 	}
 }

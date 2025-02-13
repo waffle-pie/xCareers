@@ -1,6 +1,6 @@
 package org.example.scraper;
 
-import java.io.File;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -11,58 +11,74 @@ import org.example.setting.DynamicSiteSettingCollection;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> {
-	private final String PROJECT_PATH = System.getProperty("user.dir");
+	private final WebDriver webDriver;
 
-	public DynamicJobScraper(DynamicSiteSettingCollection setting) {
+	public DynamicJobScraper(DynamicSiteSettingCollection setting, WebDriver webDriver) {
 		super(setting);
+		this.webDriver = webDriver;
 	}
 
 	@Override
-	public void setUp(DynamicSiteSettingCollection setting, ObjectMapper objectMapper) {
-		try {
-			List<RecruitmentNotice> allJobs = new ArrayList<>();
+	public List<RecruitmentNotice> scrapingBy(DynamicSiteSettingCollection setting) {
 
-			// 프로젝트 상대 경로로 WebDriver 설정
-			System.setProperty("webdriver.chrome.driver",
-				PROJECT_PATH + "\\src\\main\\resources\\driver\\chromedriver.exe");
+		List<RecruitmentNotice> allJobs = new ArrayList<>();
 
-			for (DynamicSiteSetting site : setting.getSites()) {
-				WebDriver driver = new ChromeDriver();
-				allJobs.addAll(scrapeSite(driver, site));
-			}
-
-			objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("jobs.json"), allJobs);
-		} catch (Exception e) {
-			e.printStackTrace();
+		for (DynamicSiteSetting site : setting.getSites()) {
+			allJobs.addAll(scraping(site));
 		}
+		return allJobs;
 	}
 
-	private List<RecruitmentNotice> scrapeSite(WebDriver driver, DynamicSiteSetting setting) {
+	private List<RecruitmentNotice> scraping(DynamicSiteSetting setting) {
+		List<RecruitmentNotice> jobs = new ArrayList<>();
 		try {
+			webDriver.get(setting.getUrl());
 
-			List<RecruitmentNotice> jobs = new ArrayList<>();
-			driver.get(setting.getUrl());
+			WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
+			WebElement jobList = wait.until(
+				ExpectedConditions.presenceOfElementLocated(By.xpath(setting.getJobListSelector())));
 
-			WebElement jobList = driver.findElement(By.xpath(setting.getJobListSelector()));
+			List<WebElement> jobElements = jobList.findElements(By.xpath(setting.getJobDetailSelector()));
 
-			List<WebElement> jobElements = jobList.findElements(By.tagName("li"));
-			List<WebElement> jobLinks = jobList.findElements(By.tagName("a"));
-
-			String check = jobList.getText();
+			if (jobElements.isEmpty()) {
+				System.out.println("❌ 공고 리스트가 비어 있음. XPath 확인 필요: " + setting.getJobListSelector());
+			}
 
 			for (WebElement jobElement : jobElements) {
-				String str = jobElement.getText();
+				try {
+					WebElement linkElement = null;
+					String title = null;
+					String link = null;
+
+					// ✅ href를 포함한 a 태그 찾기
+					try {
+						if (jobElement.getTagName().equals("a")) {
+							linkElement = jobElement;
+						} else {
+							linkElement = jobElement.findElement(By.tagName("a"));
+						}
+						link = linkElement.getAttribute("href");
+					} catch (NoSuchElementException e) {
+						System.out.println("⚠️ a 태그 없음");
+					}
+
+					title = jobElement.getAttribute("innerText");
+					if (title != null && link != null) {
+						jobs.add(RecruitmentNotice.create(setting.getSiteName(), title, link));
+					}
+				} catch (Exception e) {
+					System.out.println("⚠️ 특정 jobElement에서 데이터를 가져올 수 없음: " + e.getMessage());
+				}
 			}
-
-			return List.of();
-		} finally {
-			driver.quit();
+		} catch (Exception e) {
+			System.out.println("❌ 오류 발생: " + e.getMessage());
+			e.printStackTrace();
 		}
+		return jobs;
 	}
-}
 
+}

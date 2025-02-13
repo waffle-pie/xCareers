@@ -1,23 +1,26 @@
 package org.example.scraper;
 
 import java.io.IOException;
+import java.util.List;
 
+import org.example.mapper.DataMapper;
+import org.example.recruitment.RecruitmentNotice;
 import org.example.setting.SettingCollection;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public abstract class JobScraper<T extends SettingCollection<T>> {
-	private static final ObjectMapper objectMapper = new ObjectMapper();
-	private final T setting;
+	private final DataMapper mapper;
+	private final T siteCandidates;
 
-	public JobScraper(T setting) {
-		this.setting = setting;
+	public JobScraper(T siteCandidates) {
+		this.siteCandidates = siteCandidates;
+		this.mapper = new DataMapper();
 	}
 
 	public void run() throws IOException {
-		T init = setting.init(objectMapper);
-		setUp(init, objectMapper);
+		List<RecruitmentNotice> recruitmentNotices = scrapingBy(siteCandidates.init(mapper));
+		mapper.writeToJson(recruitmentNotices, "jobs.json");
 	}
 
-	public abstract void setUp(T setting, ObjectMapper objectMapper) throws IOException;
+	public abstract List<RecruitmentNotice> scrapingBy(T setting) throws
+		IOException;
 }
