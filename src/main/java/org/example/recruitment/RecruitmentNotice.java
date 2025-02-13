@@ -43,18 +43,6 @@ public class RecruitmentNotice {
 		this.href = href;
 	}
 
-	@Builder
-	private RecruitmentNotice(String site, String title, String company, String job, String career, String regular,
-		String location) {
-		this.site = site;
-		this.title = title;
-		this.company = company;
-		this.job = job;
-		this.career = career;
-		this.regular = regular;
-		this.location = location;
-	}
-
 	public static RecruitmentNotice create(String site, String title, String company, String job, String career,
 		String regular, String location, String deadline) {
 		return RecruitmentNotice.builder()
@@ -69,7 +57,7 @@ public class RecruitmentNotice {
 			.build();
 	}
 
-	public static RecruitmentNotice create(String site, String title,String href) {
+	public static RecruitmentNotice create(String site, String title, String href) {
 		return RecruitmentNotice.builder()
 			.site(site)
 			.title(title)
@@ -79,7 +67,15 @@ public class RecruitmentNotice {
 
 	public static RecruitmentNotice create(String site, String title, String company, String job, String career,
 		String regular, String location) {
-		return new RecruitmentNotice(site, title, company, job, career, regular, location);
+		return RecruitmentNotice.builder()
+			.site(site)
+			.title(title)
+			.company(company)
+			.job(job)
+			.career(career)
+			.regular(regular)
+			.location(location)
+			.build();
 	}
 
 }
