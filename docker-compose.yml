@@ -1,0 +1,57 @@
+version: '3.8'
+
+networks:
+  selenium-grid:
+    driver: bridge
+
+services:
+  event-bus:
+    image: selenium/event-bus:4.25.0  # 최신 Selenium Grid 이미지 사용
+    container_name: selenium-event-bus
+    ports:
+      - "4442:4442"  # Event Bus XPUB 포트
+      - "4443:4443"  # Event Bus XSUB 포트
+    networks:
+      - selenium-grid
+    environment:
+      - SE_EVENT_BUS_PUBLISH_EVENTS=tcp://event-bus:4442
+      - SE_EVENT_BUS_SUBSCRIBE_EVENTS=tcp://event-bus:4443
+
+  hub:
+    image: selenium/hub:4.25.0
+    container_name: selenium-hub
+    depends_on:
+      - event-bus
+    ports:
+      - "4444:4444"  # Selenium Grid Hub 포트
+    networks:
+      - selenium-grid
+    environment:
+      - SE_EVENT_BUS_PUBLISH_EVENTS=tcp://event-bus:4442
+      - SE_EVENT_BUS_SUBSCRIBE_EVENTS=tcp://event-bus:4443
+      - SE_BIND_TO_EVENT_BUS=true  # Event Bus에 연결하도록 설정
+
+  node:
+    image: selenium/node-chrome:4.25.0  # Chrome 노드 추가 (필요 시 Firefox 노드도 추가 가능)
+    container_name: selenium-node
+    depends_on:
+      - hub
+    networks:
+      - selenium-grid
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=5  # 동시 실행 가능한 최대 세션
+      - SE_NODE_SESSION_TIMEOUT=300  # 세션 타임아웃 300초
+
+#  app:
+#    build: .
+#    container_name: selenium-scraper
+#    working_dir: /app
+#    volumes:
+#      - ./target:/app/target
+#    depends_on:
+#      - hub
+#    networks:
+#      - selenium-grid
