@@ -12,5 +12,7 @@ public class DynamicSiteSetting {
 	private String url;
 	@JsonProperty
 	private String jobListSelector;
+	@JsonProperty
+	private String jobDetailSelector;
 
 }

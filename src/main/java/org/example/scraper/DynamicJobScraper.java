@@ -67,8 +67,7 @@ public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> 
 				ExpectedConditions.presenceOfElementLocated(By.xpath(setting.getJobListSelector())));
 
 			// ✅ 공고 리스트 확인
-			// 무신사 Xpath <ul> -> for <a> 당근 -> <ul> -> <div> -> <li>
-			List<WebElement> jobElements = jobList.findElements(By.xpath("./div/li | ./div/li/a | ./a"));
+			List<WebElement> jobElements = jobList.findElements(By.xpath(setting.getJobDetailSelector()));
 
 			if (jobElements.isEmpty()) {
 				System.out.println("❌ 공고 리스트가 비어 있음. XPath 확인 필요: " + setting.getJobListSelector());
@@ -92,12 +91,9 @@ public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> 
 						System.out.println("⚠️ a 태그 없음");
 					}
 
-					try {
-						title = jobElement.findElement(By.tagName("h3")).getText().trim();
-					} catch (NoSuchElementException e) {
-						title = jobElement.getText().trim(); // h3이 없으면 텍스트 직접 가져오기
-					}
 
+					// title = jobElement.findElement(By.tagName("h3")).getAttribute("innerText");
+					title = jobElement.getAttribute("innerText");
 					// ✅ 결과 저장
 					if (title != null && link != null) {
 						jobs.add(RecruitmentNotice.create(setting.getSiteName(), title, link));
