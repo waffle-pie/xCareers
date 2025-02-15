@@ -55,15 +55,21 @@ public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> 
 					String link = null;
 
 					// ✅ href를 포함한 a 태그 찾기
-					try {
-						if (jobElement.getTagName().equals("a")) {
-							linkElement = jobElement;
-						} else {
-							linkElement = jobElement.findElement(By.tagName("a"));
+					// script 방식
+					if (setting.getSiteName().equals("네이버")) {
+						link = script(jobElement, link);
+					} else {
+						// a 태그 직접
+						try {
+							if (jobElement.getTagName().equals("a")) {
+								linkElement = jobElement;
+							} else {
+								linkElement = jobElement.findElement(By.tagName("a"));
+							}
+							link = linkElement.getAttribute("href");
+						} catch (NoSuchElementException e) {
+							System.out.println("⚠️ a 태그 없음");
 						}
-						link = linkElement.getAttribute("href");
-					} catch (NoSuchElementException e) {
-						System.out.println("⚠️ a 태그 없음");
 					}
 
 					title = jobElement.getAttribute("innerText");
@@ -79,6 +85,23 @@ public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> 
 			e.printStackTrace();
 		}
 		return jobs;
+	}
+
+	private String script(WebElement jobElement, String link) {
+		WebElement linkElement;
+		try {
+			linkElement = jobElement.findElement(By.tagName("a"));
+			String onClickValue = linkElement.getAttribute("onclick");
+			link = linkElement.getAttribute("href");
+
+			if (onClickValue != null && onClickValue.contains("show(")) {
+				String jobId = onClickValue.replaceAll("[^0-9]", ""); // 숫자만 추출
+				link = "https://recruit.navercorp.com/rcrt/view.do?annoId=" + jobId;
+			}
+		} catch (NoSuchElementException e) {
+			System.out.println("⚠️ a 태그 없음");
+		}
+		return link;
 	}
 
 }
