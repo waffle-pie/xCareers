@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.example.recruitment.RecruitmentNotice;
-import org.example.setting.DynamicSiteSetting;
 import org.example.setting.DynamicSiteSettingCollection;
+import org.example.setting.SiteSetting;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -27,13 +27,13 @@ public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> 
 
 		List<RecruitmentNotice> allJobs = new ArrayList<>();
 
-		for (DynamicSiteSetting site : setting.getSites()) {
+		for (SiteSetting site : setting.getSites()) {
 			allJobs.addAll(scraping(site));
 		}
 		return allJobs;
 	}
 
-	private List<RecruitmentNotice> scraping(DynamicSiteSetting setting) {
+	private List<RecruitmentNotice> scraping(SiteSetting setting) {
 		List<RecruitmentNotice> jobs = new ArrayList<>();
 		try {
 			webDriver.get(setting.getUrl());

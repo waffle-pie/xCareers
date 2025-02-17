@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
 @Getter
-public class DynamicSiteSetting {
+public class SiteSetting {
 	@JsonProperty
 	private String siteName;
 	@JsonProperty

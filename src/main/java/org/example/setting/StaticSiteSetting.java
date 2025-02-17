@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
 
+@Deprecated
 @Getter
 public class StaticSiteSetting {
 	@JsonProperty

@@ -7,6 +7,7 @@ import org.example.mapper.DataMapper;
 
 import lombok.Getter;
 
+@Deprecated
 @Getter
 public class StaticSiteSettingCollection implements SettingCollection<StaticSiteSettingCollection> {
 	private List<StaticSiteSetting> sites;

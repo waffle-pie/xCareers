@@ -1,0 +1,11 @@
+{
+  "sites": [
+    {
+      "siteName": "CJ",
+      "url": "https://recruit.cj.net/recruit/ko/recruit/recruit/list.fo",
+      "jobListSelector": "//*[@id=\"contents\"]/div[1]/div/div[2]/div[1]/div[2]/table/tbody",
+      "jobDetailSelector": "./tr",
+      "paginationNextButtonSelector" : "//*[@id=\"contents\"]/div[1]/div/div[2]/div[2]"
+    }
+  ]
+}

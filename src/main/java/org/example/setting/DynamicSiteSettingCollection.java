@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Getter
 public class DynamicSiteSettingCollection implements SettingCollection<DynamicSiteSettingCollection> {
-	private List<DynamicSiteSetting> sites;
+	private List<SiteSetting> sites;
 
 	@Override
 	public DynamicSiteSettingCollection init(DataMapper mapper) throws IOException {
