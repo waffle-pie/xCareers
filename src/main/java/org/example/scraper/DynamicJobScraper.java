@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.example.recruitment.RecruitmentNotice;
-import org.example.setting.DynamicSiteSettingCollection;
+import org.example.setting.collection.DynamicSiteSettingCollection;
 import org.example.setting.SiteSetting;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;

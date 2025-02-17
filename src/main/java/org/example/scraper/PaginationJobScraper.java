@@ -5,16 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.example.mapper.DataMapper;
 import org.example.recruitment.RecruitmentNotice;
-import org.example.setting.DynamicSiteSettingCollection;
 import org.example.setting.PaginationSiteSetting;
-import org.example.setting.PaginationSiteSettingCollection;
-import org.example.setting.SiteSetting;
+import org.example.setting.collection.PaginationSiteSettingCollection;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 

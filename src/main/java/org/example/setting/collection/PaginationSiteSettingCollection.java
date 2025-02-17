@@ -1,14 +1,16 @@
-package org.example.setting;
+package org.example.setting.collection;
 
 import java.io.IOException;
 import java.util.List;
 
 import org.example.mapper.DataMapper;
+import org.example.setting.PaginationSiteSetting;
+import org.example.setting.SettingCollection;
 
 import lombok.Getter;
 
 @Getter
-public class PaginationSiteSettingCollection implements SettingCollection<PaginationSiteSettingCollection, PaginationSiteSetting> {
+public class PaginationSiteSettingCollection implements SettingCollection<PaginationSiteSettingCollection> {
 	private List<PaginationSiteSetting> sites;
 
 	@Override
