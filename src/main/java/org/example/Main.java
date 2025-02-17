@@ -3,15 +3,16 @@ package org.example;
 import java.io.IOException;
 
 import org.example.driver.WebDriverFactory;
+import org.example.mapper.DataMapper;
 import org.example.scraper.DynamicJobScraper;
 import org.example.scraper.PaginationJobScraper;
-import org.example.setting.DynamicSiteSettingCollection;
-import org.example.setting.PaginationSiteSettingCollection;
+import org.example.setting.collection.DynamicSiteSettingCollection;
+import org.example.setting.collection.PaginationSiteSettingCollection;
 import org.openqa.selenium.WebDriver;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
-
+		DataMapper mapper = new DataMapper();
 		WebDriver webDriver = WebDriverFactory.createChromeDriver();
 
 		//
@@ -23,7 +24,7 @@ public class Main {
 		PaginationJobScraper paginationScraper = new PaginationJobScraper(paginationSetting, webDriver);
 
 		try {
-			paginationScraper.run();
+			scraper.run(mapper);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

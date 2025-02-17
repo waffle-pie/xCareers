@@ -8,19 +8,18 @@ import org.example.recruitment.RecruitmentNotice;
 import org.example.setting.SettingCollection;
 
 public abstract class JobScraper<T extends SettingCollection<T>> {
-	private final DataMapper mapper;
 	private final T siteCandidates;
 
 	public JobScraper(T siteCandidates) {
 		this.siteCandidates = siteCandidates;
-		this.mapper = new DataMapper();
 	}
 
-	public void run() throws IOException {
-		List<RecruitmentNotice> recruitmentNotices = scrapingBy(siteCandidates.init(mapper));
+	public void run(DataMapper mapper) throws IOException {
+		siteCandidates.init(mapper);
+		List<RecruitmentNotice> recruitmentNotices = scrapingBy(siteCandidates);
 		mapper.writeToJson(recruitmentNotices, "jobs.json");
 	}
 
-	public abstract List<RecruitmentNotice> scrapingBy(T setting) throws
+	public abstract List<RecruitmentNotice> scrapingBy(T siteCandidates) throws
 		IOException;
 }
