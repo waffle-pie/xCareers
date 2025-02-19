@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.example.recruitment.RecruitmentNotice;
-import org.example.setting.DynamicSiteSetting;
-import org.example.setting.DynamicSiteSettingCollection;
+import org.example.setting.collection.DynamicSiteSettingCollection;
+import org.example.setting.SiteSetting;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -27,13 +27,13 @@ public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> 
 
 		List<RecruitmentNotice> allJobs = new ArrayList<>();
 
-		for (DynamicSiteSetting site : setting.getSites()) {
+		for (SiteSetting site : setting.getSites()) {
 			allJobs.addAll(scraping(site));
 		}
 		return allJobs;
 	}
 
-	private List<RecruitmentNotice> scraping(DynamicSiteSetting setting) {
+	private List<RecruitmentNotice> scraping(SiteSetting setting) {
 		List<RecruitmentNotice> jobs = new ArrayList<>();
 		try {
 			webDriver.get(setting.getUrl());
@@ -55,15 +55,21 @@ public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> 
 					String link = null;
 
 					// ✅ href를 포함한 a 태그 찾기
-					try {
-						if (jobElement.getTagName().equals("a")) {
-							linkElement = jobElement;
-						} else {
-							linkElement = jobElement.findElement(By.tagName("a"));
+					// script 방식
+					if (setting.getSiteName().equals("네이버")) {
+						link = script(jobElement, link);
+					} else {
+						// a 태그 직접
+						try {
+							if (jobElement.getTagName().equals("a")) {
+								linkElement = jobElement;
+							} else {
+								linkElement = jobElement.findElement(By.tagName("a"));
+							}
+							link = linkElement.getAttribute("href");
+						} catch (NoSuchElementException e) {
+							System.out.println("⚠️ a 태그 없음");
 						}
-						link = linkElement.getAttribute("href");
-					} catch (NoSuchElementException e) {
-						System.out.println("⚠️ a 태그 없음");
 					}
 
 					title = jobElement.getAttribute("innerText");
@@ -79,6 +85,23 @@ public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> 
 			e.printStackTrace();
 		}
 		return jobs;
+	}
+
+	private String script(WebElement jobElement, String link) {
+		WebElement linkElement;
+		try {
+			linkElement = jobElement.findElement(By.tagName("a"));
+			String onClickValue = linkElement.getAttribute("onclick");
+			link = linkElement.getAttribute("href");
+
+			if (onClickValue != null && onClickValue.contains("show(")) {
+				String jobId = onClickValue.replaceAll("[^0-9]", ""); // 숫자만 추출
+				link = "https://recruit.navercorp.com/rcrt/view.do?annoId=" + jobId;
+			}
+		} catch (NoSuchElementException e) {
+			System.out.println("⚠️ a 태그 없음");
+		}
+		return link;
 	}
 
 }
