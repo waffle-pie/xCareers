@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 public class DynamicSiteSettingCollectionVer2 implements SettingCollection<DynamicSiteSettingCollectionVer2> {
-	private List<DynamicSiteSetting> sites;
+	private List<SiteSetting> sites;
 
 	@Override
 	public DynamicSiteSettingCollectionVer2 init(DataMapper mapper) throws IOException {

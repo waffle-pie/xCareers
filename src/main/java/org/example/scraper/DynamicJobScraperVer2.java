@@ -1,9 +1,10 @@
 package org.example.scraper;
 
 import org.example.recruitment.RecruitmentNotice;
-import org.example.setting.DynamicSiteSetting;
-import org.example.setting.DynamicSiteSettingCollection;
+import org.example.setting.SiteSetting;
 import org.example.setting.DynamicSiteSettingCollectionVer2;
+import org.example.setting.DynamicSiteSettingCollectionVer2;
+import org.example.setting.SiteSetting;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -27,13 +28,13 @@ public class DynamicJobScraperVer2 extends JobScraper<DynamicSiteSettingCollecti
 
 		List<RecruitmentNotice> allJobs = new ArrayList<>();
 
-		for (DynamicSiteSetting site : setting.getSites()) {
+		for (SiteSetting site : setting.getSites()) {
 			allJobs.addAll(scraping(site));
 		}
 		return allJobs;
 	}
 
-	private List<RecruitmentNotice> scraping(DynamicSiteSetting setting) {
+	private List<RecruitmentNotice> scraping(SiteSetting setting) {
 		List<RecruitmentNotice> jobs = new ArrayList<>();
 		try {
 			webDriver.get(setting.getUrl());
