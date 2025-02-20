@@ -5,8 +5,10 @@ import java.io.IOException;
 import org.example.driver.WebDriverFactory;
 import org.example.mapper.DataMapper;
 import org.example.scraper.DynamicJobScraper;
+import org.example.scraper.PaginationJobClickScraper;
 import org.example.scraper.PaginationJobScraper;
 import org.example.setting.collection.DynamicSiteSettingCollection;
+import org.example.setting.collection.PaginationClickSiteSettingCollection;
 import org.example.setting.collection.PaginationSiteSettingCollection;
 import org.openqa.selenium.WebDriver;
 
@@ -22,6 +24,10 @@ public class Main {
 		// Page
 		PaginationSiteSettingCollection paginationSetting = new PaginationSiteSettingCollection();
 		PaginationJobScraper paginationScraper = new PaginationJobScraper(paginationSetting, webDriver);
+
+		//PageClick
+		PaginationClickSiteSettingCollection paginationClickSiteSettingCollection = new PaginationClickSiteSettingCollection();
+		PaginationJobClickScraper paginationJobClickScraper = new PaginationJobClickScraper(paginationClickSiteSettingCollection, webDriver);
 
 		try {
 			scraper.run(mapper);
