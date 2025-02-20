@@ -41,13 +41,13 @@ public class DynamicJobScraperVer2 extends JobScraper<DynamicSiteSettingCollecti
 			JavascriptExecutor js = (JavascriptExecutor) webDriver;
 
 			WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
-			List<WebElement> elements = webDriver.findElements(By.xpath("//*[@id=\"naver\"]/div/section/div/div/div[2]/div[2]/ul/li[*]/a"));
+			List<WebElement> elements = webDriver.findElements(By.xpath("//*[@id=\"naver\"]/div/section/div/div/div[2]/div[2]/ul/li[*]/a"));// xpath setting으로 변경
 			Actions actions = new Actions(webDriver);
 
 			// * 메서드 뺄것
 			while (true){
 				actions.sendKeys(org.openqa.selenium.Keys.PAGE_DOWN).perform();  // 한 페이지 아래로 이동
-				List<WebElement> elements2 = webDriver.findElements(By.xpath("//*[@id=\"naver\"]/div/section/div/div/div[2]/div[2]/ul/li[*]/a"));
+				List<WebElement> elements2 = webDriver.findElements(By.xpath("//*[@id=\"naver\"]/div/section/div/div/div[2]/div[2]/ul/li[*]/a"));// xpath setting으로 변경
 				if (elements.size() == elements2.size()) {
 					break;
 				}
@@ -59,7 +59,7 @@ public class DynamicJobScraperVer2 extends JobScraper<DynamicSiteSettingCollecti
 
 				while (true){
 					actions.sendKeys(org.openqa.selenium.Keys.PAGE_DOWN).perform();  // 한 페이지 아래로 이동
-					List<WebElement> elements2 = webDriver.findElements(By.xpath("//*[@id=\"naver\"]/div/section/div/div/div[2]/div[2]/ul/li[*]/a"));
+					List<WebElement> elements2 = webDriver.findElements(By.xpath("//*[@id=\"naver\"]/div/section/div/div/div[2]/div[2]/ul/li[*]/a"));// xpath setting으로 변경
 					if (elements.size() == elements2.size()) {
 						break;
 					}
