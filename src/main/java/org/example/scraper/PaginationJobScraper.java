@@ -3,6 +3,7 @@ package org.example.scraper;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.example.PaginationHandler;
 import org.example.recruitment.RecruitmentNotice;
@@ -11,6 +12,7 @@ import org.example.setting.collection.PaginationSiteSettingCollection;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -41,7 +43,7 @@ public class PaginationJobScraper extends JobScraper<PaginationSiteSettingCollec
 			wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
 			int prevPageSize = -1; // 첫 페이지 이전 값 없음
 
-			while (isClicked(setting, paginationHandler)) { // 페이지 끝까지 반복
+			while (true) { // 페이지 끝까지 반복
 				try {
 					WebElement jobList = wait.until(
 						ExpectedConditions.presenceOfElementLocated(By.xpath(setting.getJobListSelector())));
@@ -50,10 +52,24 @@ public class PaginationJobScraper extends JobScraper<PaginationSiteSettingCollec
 					for (WebElement jobElement : jobElements) {
 						try {
 							WebElement linkElement = null;
-							String title = null;
-							String link = "";
+							String title = jobElement.getAttribute("innerText");
+							String link = null;
 
-							title = jobElement.getAttribute("innerText");
+							try {
+								if (jobElement.getTagName().equals("a")) {
+									linkElement = jobElement;
+								} else {
+									linkElement = jobElement.findElement(By.tagName("a"));
+								}
+								link = linkElement.getAttribute("href");
+							} catch (NoSuchElementException e) {
+								System.out.println("⚠️ a 태그 없음");
+							}
+
+							Actions actions = new Actions(webDriver);
+							actions.click().perform();
+
+
 							if (title != null && link != null) {
 								jobs.add(RecruitmentNotice.create(setting.getSiteName(), title, link));
 							}
@@ -70,6 +86,10 @@ public class PaginationJobScraper extends JobScraper<PaginationSiteSettingCollec
 					}
 					prevPageSize = pageSize;
 
+					if (!isClicked(setting, paginationHandler)) {
+						break;
+					}
+
 				} catch (Exception e) {
 					System.out.println("❌ 페이지네이션 중 오류 발생: " + e.getMessage());
 					break;
@@ -85,4 +105,5 @@ public class PaginationJobScraper extends JobScraper<PaginationSiteSettingCollec
 	private boolean isClicked(PaginationSiteSetting setting, PaginationHandler paginationHandler) {
 		return paginationHandler.clickNextPage(setting.getPaginationNextButtonCssSelector());
 	}
+
 }
