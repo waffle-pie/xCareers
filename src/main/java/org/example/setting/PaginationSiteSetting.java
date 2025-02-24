@@ -16,5 +16,7 @@ public class PaginationSiteSetting {
 	private String jobDetailSelector;
 	@JsonProperty
 	private String paginationNextButtonSelector;
+	@JsonProperty
+	private String paginationNextButtonCssSelector;
 
 }

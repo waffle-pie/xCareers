@@ -3,8 +3,8 @@ package org.example.scraper;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
+import org.example.PaginationHandler;
 import org.example.recruitment.RecruitmentNotice;
 import org.example.setting.PaginationSiteSetting;
 import org.example.setting.collection.PaginationSiteSettingCollection;
@@ -26,25 +26,23 @@ public class PaginationJobScraper extends JobScraper<PaginationSiteSettingCollec
 	public List<RecruitmentNotice> scrapingBy(PaginationSiteSettingCollection setting) {
 
 		List<RecruitmentNotice> allJobs = new ArrayList<>();
-
+		PaginationHandler paginationHandler = new PaginationHandler(webDriver);
 		for (PaginationSiteSetting site : setting.getSites()) {
-			allJobs.addAll(scraping(site));
+			allJobs.addAll(scraping(site, paginationHandler));
 		}
 		return allJobs;
 	}
 
-	protected List<RecruitmentNotice> scraping(PaginationSiteSetting setting) {
+	protected List<RecruitmentNotice> scraping(PaginationSiteSetting setting, PaginationHandler paginationHandler) {
 		List<RecruitmentNotice> jobs = new ArrayList<>();
 		try {
 			webDriver.get(setting.getUrl());
 			WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(5));
+			wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
+			int prevPageSize = -1; // 첫 페이지 이전 값 없음
 
-			while (true) { // 페이지 끝까지 반복
+			while (isClicked(setting, paginationHandler)) { // 페이지 끝까지 반복
 				try {
-					// 페이지가 완전히 로드될 때까지 대기
-					wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
-
-					// 현재 페이지에서 jobList 가져오기
 					WebElement jobList = wait.until(
 						ExpectedConditions.presenceOfElementLocated(By.xpath(setting.getJobListSelector())));
 					List<WebElement> jobElements = (jobList.findElements(By.xpath(setting.getJobDetailSelector())));
@@ -53,18 +51,7 @@ public class PaginationJobScraper extends JobScraper<PaginationSiteSettingCollec
 						try {
 							WebElement linkElement = null;
 							String title = null;
-							String link = null;
-
-							try {
-								if (jobElement.getTagName().equals("a")) {
-									linkElement = jobElement;
-								} else {
-									linkElement = jobElement.findElement(By.tagName("a"));
-								}
-								link = linkElement.getAttribute("href");
-							} catch (NoSuchElementException e) {
-								System.out.println("⚠️ a 태그 없음");
-							}
+							String link = "";
 
 							title = jobElement.getAttribute("innerText");
 							if (title != null && link != null) {
@@ -76,8 +63,12 @@ public class PaginationJobScraper extends JobScraper<PaginationSiteSettingCollec
 									+ jobElement.toString());
 						}
 					}
-					if (!existNextPage(setting))
+
+					int pageSize = jobElements.size();
+					if (prevPageSize != -1 && pageSize < prevPageSize) {
 						break;
+					}
+					prevPageSize = pageSize;
 
 				} catch (Exception e) {
 					System.out.println("❌ 페이지네이션 중 오류 발생: " + e.getMessage());
@@ -87,27 +78,11 @@ public class PaginationJobScraper extends JobScraper<PaginationSiteSettingCollec
 
 		} catch (Exception e) {
 			System.out.println("❌ 전체 크롤링 오류 발생: " + e.getMessage());
-			e.printStackTrace();
 		}
 		return jobs;
 	}
 
-	private boolean existNextPage(PaginationSiteSetting setting) throws InterruptedException {
-		try {
-			// "다음" 버튼이 클릭 가능한지 기다리기
-			List<WebElement> paginationButton = webDriver.findElements(
-				By.xpath(setting.getPaginationNextButtonSelector()));
-			paginationButton.get(0).findElement(By.className("next")).click();
-			Thread.sleep(2000);
-
-			return true;
-		} catch (NoSuchElementException e) {
-			System.out.println("✅ 페이지네이션 끝, 더 이상 페이지 없음");
-			return false;  // 더 이상 페이지가 없으면 종료
-		} catch (Exception e) {
-			System.out.println("⚠️ 페이지네이션 버튼 클릭 실패: " + e.getMessage());
-			return false;  // 클릭 실패 시 종료
-		}
+	private boolean isClicked(PaginationSiteSetting setting, PaginationHandler paginationHandler) {
+		return paginationHandler.clickNextPage(setting.getPaginationNextButtonCssSelector());
 	}
-
 }
