@@ -10,12 +10,12 @@ import org.example.setting.SiteSetting;
 import lombok.Getter;
 
 @Getter
-public class DynamicSiteSettingCollection implements SettingCollection<DynamicSiteSettingCollection> {
+public class ScrollSiteSettingCollection implements SettingCollection<ScrollSiteSettingCollection> {
 	private List<SiteSetting> sites;
 
 	@Override
-	public DynamicSiteSettingCollection init(DataMapper mapper) throws IOException {
-		DynamicSiteSettingCollection loaded = mapper.readFromJson(DynamicSiteSettingCollection.class,
+	public ScrollSiteSettingCollection init(DataMapper mapper) throws IOException {
+		ScrollSiteSettingCollection loaded = mapper.readFromJson(ScrollSiteSettingCollection.class,
 			"dynamic_site_config.json");
 		this.sites = loaded.getSites();
 		return this;

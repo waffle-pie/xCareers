@@ -6,24 +6,25 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.example.recruitment.RecruitmentNotice;
-import org.example.setting.collection.DynamicSiteSettingCollection;
+import org.example.setting.collection.ScrollSiteSettingCollection;
 import org.example.setting.SiteSetting;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> {
+public class ScrollJobScraper extends JobScraper<ScrollSiteSettingCollection> {
 	private final WebDriver webDriver;
 
-	public DynamicJobScraper(DynamicSiteSettingCollection setting, WebDriver webDriver) {
+	public ScrollJobScraper(ScrollSiteSettingCollection setting, WebDriver webDriver) {
 		super(setting);
 		this.webDriver = webDriver;
 	}
 
 	@Override
-	public List<RecruitmentNotice> scrapingBy(DynamicSiteSettingCollection setting) {
+	public List<RecruitmentNotice> scrapingBy(ScrollSiteSettingCollection setting) {
 
 		List<RecruitmentNotice> allJobs = new ArrayList<>();
 
@@ -37,6 +38,7 @@ public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> 
 		List<RecruitmentNotice> jobs = new ArrayList<>();
 		try {
 			webDriver.get(setting.getUrl());
+			scrollToBottom();
 
 			WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
 			WebElement jobList = wait.until(
@@ -56,20 +58,17 @@ public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> 
 
 					// ✅ href를 포함한 a 태그 찾기
 					// script 방식
-					if (setting.getSiteName().equals("네이버")) {
-						link = script(jobElement, link);
-					} else {
-						// a 태그 직접
-						try {
-							if (jobElement.getTagName().equals("a")) {
-								linkElement = jobElement;
-							} else {
-								linkElement = jobElement.findElement(By.tagName("a"));
-							}
-							link = linkElement.getAttribute("href");
-						} catch (NoSuchElementException e) {
-							System.out.println("⚠️ a 태그 없음");
+
+					// a 태그 직접
+					try {
+						if (jobElement.getTagName().equals("a")) {
+							linkElement = jobElement;
+						} else {
+							linkElement = jobElement.findElement(By.tagName("a"));
 						}
+						link = linkElement.getAttribute("href");
+					} catch (NoSuchElementException e) {
+						System.out.println("⚠️ a 태그 없음");
 					}
 
 					title = jobElement.getAttribute("innerText");
@@ -102,6 +101,26 @@ public class DynamicJobScraper extends JobScraper<DynamicSiteSettingCollection> 
 			System.out.println("⚠️ a 태그 없음");
 		}
 		return link;
+	}
+
+	private void scrollToBottom() {
+		JavascriptExecutor js = (JavascriptExecutor) webDriver;
+		long lastHeight = (long) js.executeScript("return document.body.scrollHeight");
+
+		while (true) {
+			js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+			try {
+				Thread.sleep(2000); // 새로운 요소가 로드될 시간을 기다림
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			long newHeight = (long) js.executeScript("return document.body.scrollHeight");
+			if (newHeight == lastHeight) {
+				break; // 더 이상 새로운 요소가 없으면 스크롤을 멈춤
+			}
+			lastHeight = newHeight;
+		}
 	}
 
 }
