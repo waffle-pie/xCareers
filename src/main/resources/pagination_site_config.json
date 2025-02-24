@@ -5,7 +5,16 @@
       "url": "https://recruit.cj.net/recruit/ko/recruit/recruit/list.fo",
       "jobListSelector": "//*[@id=\"contents\"]/div[1]/div/div[2]/div[1]/div[2]/table/tbody",
       "jobDetailSelector": "./tr",
-      "paginationNextButtonSelector" : "//*[@id=\"contents\"]/div[1]/div/div[2]/div[2]"
+      "paginationNextButtonSelector" : "//*[@id=\"contents\"]/div[1]/div/div[2]/div[2]",
+      "paginationNextButtonCssSelector" : "next"
+    },
+    {
+      "siteName": "현대",
+      "url": "https://talent.hyundai.com/apply/applyList.hc?https://talent.hyundai.com/apply/applyList.hc?nfGubnC=ac85892205b92e8cecdc87185a3fbf039f04b2a7751ccf0e8a1f547d53b9945a&tagArray=&sortDataTagArray=&areaDataTagArray=&fieldDataTagArray=&occupDataTagArray=&intnsvYn=",
+      "jobListSelector": "//*[@id=\"contWrap\"]/div[2]/div/div[2]/div[2]/ul",
+      "jobDetailSelector": "./li",
+      "paginationNextButtonSelector" : "//*[@id=\"jobPage\"]",
+      "paginationNextButtonCssSelector" : "next__page"
     }
   ]
 }
